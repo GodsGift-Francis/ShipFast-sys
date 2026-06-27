@@ -5,6 +5,8 @@
 @tailwind utilities;
 
 @layer base {
+    [x-cloak] { display: none !important; }
+
     :root {
         --background: 40 30% 97%;
         --foreground: 220 40% 12%;

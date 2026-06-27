@@ -9,5 +9,6 @@
 </head>
 <body class="min-h-full">
     @yield('body')
+    @stack('scripts')
 </body>
 </html>

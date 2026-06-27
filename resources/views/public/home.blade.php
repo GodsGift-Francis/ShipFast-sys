@@ -20,8 +20,8 @@
                 Track parcels and freight in real time, get instant quotes, and ship worldwide — with a status alert at every step.
             </p>
             <div class="mt-8 flex flex-wrap items-center gap-3">
-                <a href="#" class="group relative overflow-hidden rounded-lg bg-accent px-5 py-3 font-semibold text-accent-foreground transition hover:bg-accent/90">Get a quote</a>
-                <a href="#" class="rounded-lg border border-primary-foreground/25 px-5 py-3 font-semibold text-primary-foreground transition hover:bg-primary-foreground/10">Explore services</a>
+                <a href="{{ route('quote.form') }}" class="group relative overflow-hidden rounded-lg bg-accent px-5 py-3 font-semibold text-accent-foreground transition hover:bg-accent/90">Get a quote</a>
+                <a href="{{ route('services') }}" class="rounded-lg border border-primary-foreground/25 px-5 py-3 font-semibold text-primary-foreground transition hover:bg-primary-foreground/10">Explore services</a>
             </div>
         </div>
 
@@ -33,9 +33,9 @@
                     <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Air Waybill · Track</span>
                     <span class="font-mono text-[11px] font-bold tracking-wider text-accent">SHF</span>
                 </div>
-                <form action="#" class="p-5">
+                <form method="GET" action="{{ route('track.form') }}" class="p-5">
                     <label for="track" class="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Tracking number</label>
-                    <input id="track" name="tracking" placeholder="SHF-K8F2-2210"
+                    <input id="track" name="number" placeholder="SHF-K8F2-2210"
                            class="mt-2 w-full rounded-lg border border-input bg-secondary/40 px-4 py-3 font-mono text-lg tracking-wide outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40">
                     <button type="submit" class="mt-3 w-full rounded-lg bg-accent px-4 py-3 font-semibold text-accent-foreground transition hover:bg-accent/90">Track package</button>
                     <div class="mt-6">
@@ -56,10 +56,22 @@
 </section>
 
 <section class="border-b border-border bg-background py-16">
-    <div class="container mx-auto px-4 text-center">
-        <p class="font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">Sprint 0 — foundation live</p>
-        <h2 class="mt-3 font-display text-fluid-title font-extrabold">The Laravel rebuild is underway</h2>
-        <p class="mx-auto mt-3 max-w-xl text-muted-foreground">Design system, database schema, models, and auth scaffolding are in place. Public pages, the portal, and the admin panel land in the next sprints.</p>
+    <div class="container mx-auto grid gap-8 px-4 sm:grid-cols-3">
+        <div>
+            <p class="font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">Live tracking</p>
+            <h3 class="mt-2 font-display text-xl font-bold">Every status, in real time</h3>
+            <p class="mt-2 text-sm text-muted-foreground">Follow each parcel from booking to delivery, with a timeline of every scan along the way.</p>
+        </div>
+        <div>
+            <p class="font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">Instant quotes</p>
+            <h3 class="mt-2 font-display text-xl font-bold">Transparent pricing</h3>
+            <p class="mt-2 text-sm text-muted-foreground">Dimensional weight, zone, and fuel surcharge worked out instantly. No account required.</p>
+        </div>
+        <div>
+            <p class="font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">Proactive alerts</p>
+            <h3 class="mt-2 font-display text-xl font-bold">Email and SMS updates</h3>
+            <p class="mt-2 text-sm text-muted-foreground">Recipients get notified automatically the moment a shipment changes status.</p>
+        </div>
     </div>
 </section>
 @endsection
