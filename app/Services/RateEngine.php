@@ -2,63 +2,50 @@
 
 namespace App\Services;
 
+use App\Support\Country;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
+
 class RateEngine
 {
-    /** Per-service base charge, per-kg rate, and base transit days. */
-    private const RATES = [
-        'standard'      => ['base' => 4,  'perKg' => 1.8, 'days' => 3],
-        'express'       => ['base' => 9,  'perKg' => 3.5, 'days' => 2],
-        'overnight'     => ['base' => 15, 'perKg' => 5.0, 'days' => 1],
-        'freight'       => ['base' => 20, 'perKg' => 1.2, 'days' => 5],
-        'international'  => ['base' => 12, 'perKg' => 4.0, 'days' => 5],
-    ];
-
-    private const FUEL_SURCHARGE = 0.16;   // 16%
-    private const DIM_DIVISOR = 5000;      // cm^3 per kg
-    private const MIN_CHARGE = 8.0;
-    private const INTL_ZONE = 1.35;        // cross-border multiplier
-
-    /**
-     * @return array{cost: float, days: int, billableWeight: float}
-     */
-    public function quote(
-        string $serviceType,
-        float $weight,
-        ?string $dimensions,
-        string $originCountry,
-        string $destinationCountry,
-    ): array {
-        $rate = self::RATES[$serviceType] ?? self::RATES['standard'];
-
-        $dimWeight = $this->dimensionalWeight($dimensions);
-        $billable = max($weight, $dimWeight, 1.0);
-
-        $international = strcasecmp(trim($originCountry), trim($destinationCountry)) !== 0;
-        $zone = $international ? self::INTL_ZONE : 1.0;
-
-        $cost = ($rate['base'] + $billable * $rate['perKg']) * $zone * (1 + self::FUEL_SURCHARGE);
-        $cost = max($cost, self::MIN_CHARGE);
-
-        $days = $rate['days'] + ($international ? 3 : 0);
-
-        return [
-            'cost' => round($cost, 2),
-            'days' => $days,
-            'billableWeight' => round($billable, 2),
-        ];
+    public static function dimensionRules(): array
+    {
+        return ['nullable', 'string', 'max:60', 'regex:/^\s*\d+(?:\.\d+)?\s*[x×]\s*\d+(?:\.\d+)?\s*[x×]\s*\d+(?:\.\d+)?\s*$/iu'];
     }
 
-    /** Parse "LxWxH" (cm) into a volumetric weight in kg. */
-    private function dimensionalWeight(?string $dimensions): float
+    public function quote(string $serviceType, float $weight, ?string $dimensions, string $originCountry, string $destinationCountry): array
     {
-        if (! $dimensions) {
-            return 0.0;
+        $rate = config("shipping.services.{$serviceType}");
+        if (! $rate) {
+            throw ValidationException::withMessages(['service_type'=>'Choose an available shipping service.']);
         }
-        if (! preg_match_all('/\d+(?:\.\d+)?/', $dimensions, $m) || count($m[0]) < 3) {
-            return 0.0;
+        if (! is_finite($weight) || $weight <= 0 || $weight > 10000) {
+            throw ValidationException::withMessages(['weight' => 'Choose a valid service and enter a weight between 0.01 and 10,000 kg.']);
         }
-        [$l, $w, $h] = array_map('floatval', array_slice($m[0], 0, 3));
+        $international = Country::international($originCountry, $destinationCountry);
 
-        return ($l * $w * $h) / self::DIM_DIVISOR;
+        $dimWeight = 0;
+        if ($dimensions) {
+            if (! preg_match('/^\s*(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*$/iu', $dimensions, $m)) {
+                throw ValidationException::withMessages(['dimensions' => 'Use length × width × height in cm, for example 30x20x10.']);
+            }
+            $sides = array_map('floatval', array_slice($m, 1));
+            if (min($sides) <= 0 || max($sides) > 1000) {
+                throw ValidationException::withMessages(['dimensions' => 'Each dimension must be greater than zero and no more than 1,000 cm.']);
+            }
+            $dimWeight = array_product($sides) / config('shipping.dimensional_divisor');
+        }
+        $billable = ceil(max($weight, $dimWeight) * 2) / 2;
+        $transport = round(($rate['base'] + $billable * $rate['per_kg']) * ($international ? config('shipping.international_multiplier') : 1), 2);
+        $fuel = round($transport * config('shipping.fuel_surcharge'), 2);
+        $minimumAdjustment = max(0, round(config('shipping.minimum_charge') - $transport - $fuel, 2));
+        $days = $rate['days'] + ($international ? 3 : 0);
+
+        return ['cost' => round($transport + $fuel + $minimumAdjustment, 2), 'days' => $days, 'billableWeight' => $billable, 'actualWeight' => $weight, 'dimensionalWeight' => round($dimWeight, 3), 'transport' => $transport, 'fuel' => $fuel, 'minimumAdjustment' => $minimumAdjustment, 'currency' => config('shipping.currency'), 'international' => $international, 'estimatedDelivery' => $this->deliveryDate($days)->toDateString(), 'notice' => 'ShipFast estimate in USD. Duties and taxes excluded. Weekends excluded; holidays and customs may affect delivery.'];
+    }
+
+    public function deliveryDate(int $days): Carbon
+    {
+        return Carbon::now()->addWeekdays($days)->endOfDay();
     }
 }

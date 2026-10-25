@@ -2,6 +2,7 @@
 @section('title', 'Invoices — ShipFast')
 @section('heading', 'Invoices')
 @section('content')
+<div class="workspace-intro"><div><p class="eyebrow">SHIPFAST / OPERATIONS</p><h2>Keep the numbers moving.</h2><p>Manage shipping invoices and payment records in one place.</p></div></div>
 @use('App\Support\Status')
 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <form method="GET" class="flex gap-2">

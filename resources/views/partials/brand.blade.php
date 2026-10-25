@@ -1,4 +1,1 @@
-<a href="{{ route('home') }}" class="flex items-center gap-2.5">
-    <span class="grid h-9 w-9 place-items-center rounded-[8px] bg-accent font-mono text-xs font-bold tracking-tight text-accent-foreground">SHF</span>
-    <span class="font-display text-xl font-extrabold tracking-tight">ShipFast</span>
-</a>
+<a href="{{ route('home') }}" class="brand" aria-label="ShipFast home"><span class="brand-symbol"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m5 9 11-6 11 6-11 6L5 9Zm0 7 11 6 11-6M5 23l11 6 11-6" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg></span><span>Ship<span class="brand-fast">Fast</span><span class="brand-dot">.</span></span></a>

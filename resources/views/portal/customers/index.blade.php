@@ -2,6 +2,7 @@
 @section('title', 'Customers — ShipFast')
 @section('heading', 'Customers')
 @section('content')
+<div class="workspace-intro"><div><p class="eyebrow">SHIPFAST / OPERATIONS</p><h2>The people behind every parcel.</h2><p>Keep customer details close, from first booking to the next.</p></div></div>
 @use('App\Support\Status')
 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <form method="GET" class="flex flex-1 gap-2">

@@ -7,6 +7,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\RateController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\ShipmentController;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,8 @@ Route::get('/services', [PublicController::class, 'services'])->name('services')
 Route::get('/track', [PublicController::class, 'track'])->name('track.form');
 Route::get('/track/{trackingNumber}', [PublicController::class, 'track'])->name('track.show');
 Route::get('/quote', [PublicController::class, 'quoteForm'])->name('quote.form');
-Route::post('/quote', [PublicController::class, 'storeQuote'])->name('quote.store');
+Route::post('/quote', [PublicController::class, 'storeQuote'])->middleware('throttle:20,1')->name('quote.store');
+Route::post('/rates/estimate', RateController::class)->middleware('throttle:60,1')->name('rates.estimate');
 Route::get('/healthz', fn () => response()->json(['status' => 'ok']))->name('healthz');
 
 require __DIR__.'/auth.php';
@@ -38,6 +40,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
     Route::get('/shipments/create', [ShipmentController::class, 'create'])->name('shipments.create');
     Route::post('/shipments', [ShipmentController::class, 'store'])->name('shipments.store');
+    Route::get('/shipments/{shipment}/edit', [ShipmentController::class, 'edit'])->name('shipments.edit');
+    Route::patch('/shipments/{shipment}', [ShipmentController::class, 'update'])->name('shipments.update');
+    Route::get('/shipments/{shipment}/waybill', [ShipmentController::class, 'waybill'])->name('shipments.waybill');
     Route::get('/shipments/{shipment}', [ShipmentController::class, 'show'])->name('shipments.show');
     Route::post('/shipments/{shipment}/events', [ShipmentController::class, 'addEvent'])->name('shipments.events');
     Route::patch('/shipments/{shipment}/cancel', [ShipmentController::class, 'cancel'])->name('shipments.cancel');

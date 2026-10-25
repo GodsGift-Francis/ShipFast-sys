@@ -21,7 +21,8 @@ class PublicController extends Controller
 
     public function track(Request $request, ?string $trackingNumber = null)
     {
-        $number = $trackingNumber ?: $request->query('number');
+        $request->validate(['number' => ['nullable', 'string', 'max:80']]);
+        $number = strtoupper(trim($trackingNumber ?: ($request->query('number') ?? '')));
         $shipment = null;
         $events = collect();
         $notFound = false;
@@ -46,13 +47,13 @@ class PublicController extends Controller
     public function storeQuote(Request $request, RateEngine $engine)
     {
         $data = $request->validate([
-            'service_type' => ['required', 'in:standard,express,overnight,freight,international'],
+            'service_type' => ['required', 'in:standard,express,freight,international'],
             'origin_city' => ['required', 'string', 'max:120'],
             'origin_country' => ['required', 'string', 'max:120'],
             'destination_city' => ['required', 'string', 'max:120'],
             'destination_country' => ['required', 'string', 'max:120'],
-            'weight' => ['required', 'numeric', 'min:0.1'],
-            'dimensions' => ['nullable', 'string', 'max:60'],
+            'weight' => ['required', 'numeric', 'min:0.01', 'max:10000'],
+            'dimensions' => RateEngine::dimensionRules(),
             'contact_name' => ['nullable', 'string', 'max:120'],
             'contact_email' => ['nullable', 'email'],
         ]);
@@ -70,9 +71,11 @@ class PublicController extends Controller
             'estimated_cost' => $result['cost'],
             'estimated_days' => $result['days'],
             'status' => 'pending',
+            'expires_at' => now()->addDays(config('shipping.quote_valid_days')),
         ]);
 
         return redirect()->route('quote.form')->with('quote', [
+            ...$result,
             'cost' => $result['cost'],
             'days' => $result['days'],
             'service' => $data['service_type'],

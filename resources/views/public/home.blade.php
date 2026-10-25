@@ -1,77 +1,9 @@
 @extends('layouts.public')
-
-@section('title', 'ShipFast — Global shipping & logistics')
-
+@section('title', 'ShipFast — Shipping made clear')
 @section('content')
-<section class="relative overflow-hidden bg-primary text-primary-foreground">
-    <div class="waybill-grid absolute inset-0 opacity-40"></div>
-    <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/15 blur-3xl animate-glow-pulse"></div>
-    <div class="container relative mx-auto grid items-center gap-12 px-4 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
-        <div>
-            <p class="inline-flex items-center gap-2 rounded-full border border-primary-foreground/15 bg-primary-foreground/5 px-3 py-1 font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">
-                <span class="h-1.5 w-1.5 rounded-full bg-accent animate-transit-pulse"></span>
-                Global freight &amp; parcel
-            </p>
-            <h1 class="mt-5 font-display text-fluid-hero font-extrabold animate-reveal">
-                <span class="block">Know where</span>
-                <span class="block">it is. <span class="text-accent">Every mile.</span></span>
-            </h1>
-            <p class="mt-6 max-w-md text-lg text-primary-foreground/70">
-                Track parcels and freight in real time, get instant quotes, and ship worldwide — with a status alert at every step.
-            </p>
-            <div class="mt-8 flex flex-wrap items-center gap-3">
-                <a href="{{ route('quote.form') }}" class="group relative overflow-hidden rounded-lg bg-accent px-5 py-3 font-semibold text-accent-foreground transition hover:bg-accent/90">Get a quote</a>
-                <a href="{{ route('services') }}" class="rounded-lg border border-primary-foreground/25 px-5 py-3 font-semibold text-primary-foreground transition hover:bg-primary-foreground/10">Explore services</a>
-            </div>
-        </div>
-
-        {{-- Waybill track panel --}}
-        <div class="rounded-2xl bg-card p-1.5 text-card-foreground shadow-2xl shadow-black/40 ring-1 ring-black/5 animate-reveal">
-            <div class="relative overflow-hidden rounded-[12px] border border-border bg-background">
-                <div class="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-gradient-to-b from-accent/20 to-transparent animate-scanline"></div>
-                <div class="flex items-center justify-between border-b border-dashed border-border px-5 py-3">
-                    <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Air Waybill · Track</span>
-                    <span class="font-mono text-[11px] font-bold tracking-wider text-accent">SHF</span>
-                </div>
-                <form method="GET" action="{{ route('track.form') }}" class="p-5">
-                    <label for="track" class="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Tracking number</label>
-                    <input id="track" name="number" placeholder="SHF-K8F2-2210"
-                           class="mt-2 w-full rounded-lg border border-input bg-secondary/40 px-4 py-3 font-mono text-lg tracking-wide outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40">
-                    <button type="submit" class="mt-3 w-full rounded-lg bg-accent px-4 py-3 font-semibold text-accent-foreground transition hover:bg-accent/90">Track package</button>
-                    <div class="mt-6">
-                        <svg viewBox="0 0 320 26" class="w-full" aria-label="route">
-                            <line x1="14" y1="13" x2="306" y2="13" stroke="hsl(var(--border))" stroke-width="2" />
-                            <line x1="14" y1="13" x2="306" y2="13" stroke="hsl(var(--accent))" stroke-width="2" stroke-dasharray="6 8" class="animate-route-dash" />
-                            <circle cx="14" cy="13" r="5" fill="hsl(var(--primary))" />
-                            <circle cx="306" cy="13" r="5" fill="hsl(var(--accent))" class="animate-transit-pulse" />
-                        </svg>
-                        <div class="mt-1 flex justify-between font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                            <span>Origin</span><span>Destination</span>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="border-b border-border bg-background py-16">
-    <div class="container mx-auto grid gap-8 px-4 sm:grid-cols-3">
-        <div>
-            <p class="font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">Live tracking</p>
-            <h3 class="mt-2 font-display text-xl font-bold">Every status, in real time</h3>
-            <p class="mt-2 text-sm text-muted-foreground">Follow each parcel from booking to delivery, with a timeline of every scan along the way.</p>
-        </div>
-        <div>
-            <p class="font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">Instant quotes</p>
-            <h3 class="mt-2 font-display text-xl font-bold">Transparent pricing</h3>
-            <p class="mt-2 text-sm text-muted-foreground">Dimensional weight, zone, and fuel surcharge worked out instantly. No account required.</p>
-        </div>
-        <div>
-            <p class="font-mono text-xs font-bold uppercase tracking-[0.2em] text-accent">Proactive alerts</p>
-            <h3 class="mt-2 font-display text-xl font-bold">Email and SMS updates</h3>
-            <p class="mt-2 text-sm text-muted-foreground">Recipients get notified automatically the moment a shipment changes status.</p>
-        </div>
-    </div>
-</section>
+<section class="shipping-hero"><div class="site-wrap hero-layout"><div class="hero-copy"><p class="eyebrow light"><span class="tiny-line"></span> FOR EVERY PARCEL. EVERY POSSIBILITY.</p><h1>Your world.<br>A little <em>closer.</em></h1><p class="hero-description">From everyday deliveries to your next big move. Book with confidence and keep every shipment in sight.</p><div class="hero-actions"><a class="button button-orange" href="{{ route('quote.form') }}">Get a shipping quote <span>↗︎</span></a><a class="hero-text-link" href="{{ route('services') }}">Explore our services →</a></div><div class="hero-assurances"><span>✓ Clear pricing</span><span>✓ Delivery updates</span><span>✓ Parcel & freight</span></div></div><div class="cargo-scene" aria-hidden="true"><div class="scene-coordinate">SHIPFAST / CONNECTING YOUR WORLD</div><svg viewBox="0 0 620 400" role="img"><defs><pattern id="lines" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24V0h24" fill="none" stroke="#ffffff" stroke-opacity=".07"/></pattern></defs><rect width="620" height="400" fill="url(#lines)"/><ellipse cx="340" cy="322" rx="230" ry="45" fill="#07192c"/><path d="M40 285C150 285 80 70 300 86S435 330 585 140" fill="none" stroke="#ff8b55" stroke-width="2" stroke-dasharray="6 8" opacity=".7"/><g stroke="#123348" stroke-width="2"><path d="m100 231 180-84 220 86-179 86Z" fill="#e7edf0"/><path d="m100 231 221 88v62l-221-89Z" fill="#b2c3ca"/><path d="m321 319 179-86v62l-179 86Z" fill="#839da9"/><path d="m140 165 151-70 190 74-152 72Z" fill="#ff9964"/><path d="m140 165 189 76v72l-189-76Z" fill="#ee6b35"/><path d="m329 241 152-72v72l-152 72Z" fill="#bd4b25"/><path d="m222 112 99-47 137 55-99 47Z" fill="#4b8098"/><path d="m222 112 137 55v67l-137-55Z" fill="#2d5c73"/><path d="m359 167 99-47v67l-99 47Z" fill="#20445b"/></g><g stroke="#fff" stroke-opacity=".2" stroke-width="3"><path d="m157 180 0 49m19-41v49m19-41v49m19-41v49m19-41v49m19-41v49m19-41v49m19-41v49m19-41v49M240 126v45m18-38v45m18-38v45m18-38v45m18-38v45m18-38v45m18-38v45"/></g><text x="153" y="216" fill="#fff" font-family="Arial" font-size="15" font-weight="bold" transform="rotate(22 153 216)">SHIPFAST</text><circle cx="300" cy="86" r="7" fill="#ff8954"/><circle cx="585" cy="140" r="7" fill="#ff8954"/><circle cx="40" cy="285" r="7" fill="#ff8954"/></svg><div class="scene-label"><span class="pulse-dot"></span> FROM HERE. TO WHAT’S NEXT.</div></div></div></section>
+<div class="site-wrap"><div class="tracking-dock"><div><span class="eyebrow">ALREADY ON ITS WAY?</span><h2>Let’s find your shipment.</h2></div><form action="{{ route('track.form') }}" method="GET"><label class="sr-only" for="home-tracking">Tracking number</label><input id="home-tracking" name="number" placeholder="Enter your tracking number" required maxlength="80"><button class="button button-navy">Track shipment <span>→</span></button></form></div></div>
+<section class="site-wrap section-space"><div class="section-heading"><div><p class="eyebrow">THE RIGHT WAY TO SEND IT</p><h2>Big plans. Small parcels.<br>We make room for both.</h2></div><p>Choose the balance of speed and value that works for your shipment.</p></div><div class="service-grid">@foreach([['01','Everyday shipping','Reliable parcel services for the things that keep life and business moving.','standard','↗︎'],['02','Express delivery','When timing matters, give your parcel a little more priority.','express','↗︎'],['03','Freight & international','A considered approach to heavier cargo and cross-border deliveries.','freight','↗︎']] as [$n,$title,$body,$service,$icon])<a class="service-tile" href="{{ route('quote.form',['service'=>$service]) }}"><div class="service-icon">@if($service==='standard')<svg viewBox="0 0 32 32" fill="none"><path d="m5 9 11-6 11 6-11 6L5 9Zm0 0v14l11 6 11-6V9M16 15v14M10 6l12 6"/></svg>@elseif($service==='express')<svg viewBox="0 0 32 32" fill="none"><path d="M18 3 6 18h10l-2 11 13-17H17l1-9Z"/></svg>@else<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c8 8 8 16 0 24-8-8-8-16 0-24Z"/></svg>@endif</div><span class="tile-index">{{ $n }}</span><h3>{{ $title }}</h3><p>{{ $body }}</p><span class="tile-link">Find your service {{ $icon }}</span></a>@endforeach</div></section>
+<section class="how-section"><div class="site-wrap how-grid"><div><p class="eyebrow">LESS GUESSWORK. MORE GOING.</p><h2>From booked<br>to <em>delivered.</em></h2><p>Clear steps, useful updates, and one place to see what happens next.</p><a class="button button-navy" href="{{ route('quote.form') }}">Start with a quote →</a></div><ol class="how-steps"><li><span>01</span><div><h3>Tell us what’s travelling</h3><p>Add your route, weight and parcel dimensions.</p></div></li><li><span>02</span><div><h3>Choose your pace</h3><p>Compare services with an itemized estimate before booking.</p></div></li><li><span>03</span><div><h3>Follow every milestone</h3><p>See collection, transit and delivery updates in one timeline.</p></div></li></ol></div></section>
+<section class="site-wrap section-space"><div class="business-banner"><div><p class="eyebrow light">BUILT FOR YOUR NEXT CHAPTER</p><h2>All your shipping.<br>One clear workspace.</h2><p>Keep shipments, customers, quotes and invoices moving together.</p></div><a class="button button-orange" href="{{ route('login') }}">Open your workspace ↗︎</a></div></section>
 @endsection

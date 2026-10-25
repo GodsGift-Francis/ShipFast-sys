@@ -1,74 +1,14 @@
 @extends('layouts.portal')
-@section('title', 'New shipment — ShipFast')
-@section('heading', 'New shipment')
+@section('title', ($shipment->exists?'Edit booking':'Create shipment').' — ShipFast')
+@section('heading', $shipment->exists?'Edit booking':'Create shipment')
 @section('content')
-<form method="POST" action="{{ route('shipments.store') }}" class="mx-auto max-w-3xl space-y-6">
-    @csrf
-    @if ($errors->any())
-        <div class="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">{{ $errors->first() }}</div>
-    @endif
-
-    <div class="rounded-xl border border-border bg-card p-6">
-        <h2 class="font-display text-lg font-bold">Service</h2>
-        <div class="mt-4 grid gap-4 sm:grid-cols-2">
-            <div>
-                <label class="text-sm font-medium">Service type</label>
-                <select name="service_type" class="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                    @foreach (['standard','express','overnight','freight','international'] as $v)
-                        <option value="{{ $v }}" @selected(old('service_type')===$v)>{{ ucfirst($v) }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="text-sm font-medium">Customer (optional)</label>
-                <select name="customer_id" class="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                    <option value="">— None —</option>
-                    @foreach ($customers as $c)
-                        <option value="{{ $c->id }}" @selected(old('customer_id')==$c->id)>{{ $c->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid gap-6 md:grid-cols-2">
-        <div class="rounded-xl border border-border bg-card p-6">
-            <h2 class="font-display text-lg font-bold">Origin</h2>
-            <div class="mt-4 space-y-3">
-                <input name="origin_city" value="{{ old('origin_city') }}" placeholder="City" class="w-full rounded-lg border border-input bg-background px-3 py-2.5" required>
-                <input name="origin_country" value="{{ old('origin_country') }}" placeholder="Country" class="w-full rounded-lg border border-input bg-background px-3 py-2.5" required>
-                <input name="origin_address" value="{{ old('origin_address') }}" placeholder="Address (optional)" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                <input name="sender_name" value="{{ old('sender_name') }}" placeholder="Sender name" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                <input name="sender_email" type="email" value="{{ old('sender_email') }}" placeholder="Sender email" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                <input name="sender_phone" value="{{ old('sender_phone') }}" placeholder="Sender phone" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-            </div>
-        </div>
-        <div class="rounded-xl border border-border bg-card p-6">
-            <h2 class="font-display text-lg font-bold">Destination</h2>
-            <div class="mt-4 space-y-3">
-                <input name="destination_city" value="{{ old('destination_city') }}" placeholder="City" class="w-full rounded-lg border border-input bg-background px-3 py-2.5" required>
-                <input name="destination_country" value="{{ old('destination_country') }}" placeholder="Country" class="w-full rounded-lg border border-input bg-background px-3 py-2.5" required>
-                <input name="destination_address" value="{{ old('destination_address') }}" placeholder="Address (optional)" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                <input name="recipient_name" value="{{ old('recipient_name') }}" placeholder="Recipient name" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                <input name="recipient_email" type="email" value="{{ old('recipient_email') }}" placeholder="Recipient email" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-                <input name="recipient_phone" value="{{ old('recipient_phone') }}" placeholder="Recipient phone" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-            </div>
-        </div>
-    </div>
-
-    <div class="rounded-xl border border-border bg-card p-6">
-        <h2 class="font-display text-lg font-bold">Parcel</h2>
-        <div class="mt-4 grid gap-4 sm:grid-cols-2">
-            <input name="weight" type="number" step="0.1" min="0" value="{{ old('weight') }}" placeholder="Weight (kg)" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-            <input name="dimensions" value="{{ old('dimensions') }}" placeholder="Dimensions LxWxH cm (optional)" class="w-full rounded-lg border border-input bg-background px-3 py-2.5">
-            <textarea name="notes" placeholder="Notes (optional)" rows="2" class="w-full rounded-lg border border-input bg-background px-3 py-2.5 sm:col-span-2">{{ old('notes') }}</textarea>
-        </div>
-        <p class="mt-3 text-xs text-muted-foreground">Shipping cost and ETA are calculated automatically from the rate engine.</p>
-    </div>
-
-    <div class="flex gap-3">
-        <button class="rounded-lg bg-accent px-5 py-3 font-semibold text-accent-foreground transition hover:bg-accent/90">Create shipment</button>
-        <a href="{{ route('shipments.index') }}" class="rounded-lg border border-border px-5 py-3 font-semibold">Cancel</a>
-    </div>
-</form>
+@php($editing=$shipment->exists)
+<div class="workspace-intro"><div><p class="eyebrow"><a href="{{ route('shipments.index') }}">SHIPMENTS</a> / {{ $editing?$shipment->tracking_number:'NEW BOOKING' }}</p><h2>{{ $editing?'Fine-tune the details.':'A great journey starts here.' }}</h2><p>{{ $editing?'Updates recalculate the shipping estimate before collection.':'Add the details. Compare your options. Get it moving.' }}</p></div><a class="quiet-link" href="{{ route('shipments.index') }}">← Back to shipments</a></div>
+<form method="POST" action="{{ $editing?route('shipments.update',$shipment):route('shipments.store') }}" class="booking-grid" x-data="shippingForm(@js(['origin'=>old('origin_city',$shipment->origin_city??''),'destination'=>old('destination_city',$shipment->destination_city??''),'originCountry'=>old('origin_country',$shipment->origin_country??''),'destinationCountry'=>old('destination_country',$shipment->destination_country??''),'weight'=>old('weight',$shipment->weight??''),'dimensions'=>old('dimensions',$shipment->dimensions??''),'service'=>old('service_type',$shipment->service_type??'standard')]))" @input.debounce.450ms="refresh()">
+@csrf @if($editing) @method('PATCH') @endif
+<div class="booking-main"><div class="booking-progress"><a href="#journey"><span>1</span> The journey</a><i></i><a href="#parcel"><span>2</span> The parcel</a><i></i><a href="#service"><span>3</span> The service</a></div>
+<section class="form-panel" id="journey"><div class="form-section-title"><span>01</span><div><h3>Where are we heading?</h3><p>Start with collection and delivery details.</p></div></div><div class="address-grid">@foreach(['origin'=>'Send from','destination'=>'Deliver to'] as $prefix=>$title)<fieldset><legend><span class="address-dot {{ $prefix==='destination'?'destination-dot':'' }}"></span>{{ $title }}</legend><div class="field"><label for="{{ $prefix }}_address">Street address <span>*</span></label><input id="{{ $prefix }}_address" name="{{ $prefix }}_address" value="{{ old($prefix.'_address',$shipment->{$prefix.'_address'}) }}" placeholder="Street and building number" required maxlength="255" autocomplete="off"></div><div class="field-pair"><div class="field"><label for="{{ $prefix }}_city">City <span>*</span></label><input id="{{ $prefix }}_city" name="{{ $prefix }}_city" x-model="{{ $prefix==='origin'?'origin':'destination' }}" value="{{ old($prefix.'_city',$shipment->{$prefix.'_city'}) }}" placeholder="City" required maxlength="120"></div><div class="field"><label for="{{ $prefix }}_postal_code">Postal code</label><input id="{{ $prefix }}_postal_code" name="{{ $prefix }}_postal_code" value="{{ old($prefix.'_postal_code',$shipment->{$prefix.'_postal_code'}) }}" placeholder="Where applicable" maxlength="30"></div></div><div class="field"><label for="{{ $prefix }}_country">Country <span>*</span></label><input id="{{ $prefix }}_country" name="{{ $prefix }}_country" x-model="{{ $prefix==='origin'?'originCountry':'destinationCountry' }}" value="{{ old($prefix.'_country',$shipment->{$prefix.'_country'}) }}" placeholder="Country name" list="countries" required maxlength="120"></div>@php($person=$prefix==='origin'?'sender':'recipient')<div class="field"><label for="{{ $person }}_name">{{ ucfirst($person) }} name <span>*</span></label><input id="{{ $person }}_name" name="{{ $person }}_name" value="{{ old($person.'_name',$shipment->{$person.'_name'}) }}" placeholder="Full name" required maxlength="120"></div><div class="field-pair"><div class="field"><label for="{{ $person }}_email">Email</label><input id="{{ $person }}_email" name="{{ $person }}_email" type="email" value="{{ old($person.'_email',$shipment->{$person.'_email'}) }}" placeholder="name@example.com"></div><div class="field"><label for="{{ $person }}_phone">Phone</label><input id="{{ $person }}_phone" name="{{ $person }}_phone" type="tel" value="{{ old($person.'_phone',$shipment->{$person.'_phone'}) }}" placeholder="Include country code" maxlength="40"></div></div></fieldset>@endforeach</div></section>
+<section class="form-panel" id="parcel"><div class="form-section-title"><span>02</span><div><h3>What’s travelling?</h3><p>Accurate measurements make for a better estimate.</p></div></div><div class="field"><label for="contents_description">Contents description <span>*</span></label><input id="contents_description" name="contents_description" value="{{ old('contents_description',$shipment->contents_description) }}" placeholder="For example: two cotton shirts" required maxlength="255"></div><div class="field-pair"><div class="field"><label for="weight">Actual weight (kg) <span>*</span></label><input id="weight" name="weight" type="number" step="0.01" min="0.01" max="10000" x-model="weight" value="{{ old('weight',$shipment->weight) }}" placeholder="0.00" required></div><div class="field"><label for="dimensions">Dimensions (cm)</label><input id="dimensions" name="dimensions" x-model="dimensions" value="{{ old('dimensions',$shipment->dimensions) }}" placeholder="30x20x10"><small>Length × width × height</small></div></div><div class="customs-box" x-show="estimate?.international" x-cloak><h4>Cross-border shipment</h4><p>Record the goods value and country of manufacture. Confirm destination-specific documents before dispatch; these details do not submit a customs declaration.</p><div class="field-pair"><div class="field"><label for="declared_value">Goods value (USD) <span>*</span></label><input id="declared_value" name="declared_value" type="number" min="0.01" step="0.01" value="{{ old('declared_value',$shipment->declared_value) }}" :required="!!estimate?.international"></div><div class="field"><label for="country_of_manufacture">Country of manufacture <span>*</span></label><input id="country_of_manufacture" name="country_of_manufacture" value="{{ old('country_of_manufacture',$shipment->country_of_manufacture) }}" :required="!!estimate?.international" maxlength="120"></div></div><div class="field"><label for="hs_code">HS tariff code (optional)</label><input id="hs_code" name="hs_code" value="{{ old('hs_code',$shipment->hs_code) }}" placeholder="6–10 digits, if known" pattern="[0-9]{6,10}" maxlength="10"></div></div><label class="checkbox-field"><input name="signature_required" type="checkbox" value="1" @checked(old('signature_required',$shipment->signature_required))><span><strong>Require a recipient signature</strong><small>Operator must record who received the parcel before marking it delivered.</small></span></label><div class="field"><label for="notes">Internal booking notes</label><textarea id="notes" name="notes" rows="2" maxlength="1000" placeholder="Handling instructions or details for your team">{{ old('notes',$shipment->notes) }}</textarea></div></section>
+<section class="form-panel" id="service"><div class="form-section-title"><span>03</span><div><h3>Choose your pace.</h3><p>Compare estimated prices and transit times.</p></div></div>@include('partials.service-options')<div class="field"><label for="customer_id">Link to a customer (optional)</label><select name="customer_id" id="customer_id"><option value="">No customer linked</option>@foreach($customers as $c)<option value="{{ $c->id }}" @selected(old('customer_id',$shipment->customer_id)==$c->id)>{{ $c->name }}</option>@endforeach</select></div></section><div class="booking-submit"><p>Booking creates a ShipFast tracking number.<br>No carrier pickup is scheduled automatically.</p><button class="button button-orange">{{ $editing?'Save booking & recalculate':'Create shipment' }} →</button></div></div>@include('partials.rate-summary')
+<datalist id="countries">@foreach(['Nigeria','Ghana','United States','United Kingdom','Canada','Germany','France','China','United Arab Emirates','India','Australia','South Africa','Kenya'] as $country)<option value="{{ $country }}">@endforeach</datalist></form>
 @endsection

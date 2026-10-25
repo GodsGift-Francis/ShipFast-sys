@@ -3,20 +3,8 @@
 @section('heading', 'Shipments')
 @section('content')
 @use('App\Support\Status')
-<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <form method="GET" class="flex flex-1 flex-wrap gap-2">
-        <input name="q" value="{{ request('q') }}" placeholder="Search tracking, city, recipient" class="min-w-0 flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm">
-        <select name="status" class="rounded-lg border border-input bg-background px-3 py-2 text-sm" onchange="this.form.submit()">
-            <option value="">All statuses</option>
-            @foreach (\App\Services\ShipmentStatusService::STATUSES as $s)
-                <option value="{{ $s }}" @selected(request('status')===$s)>{{ Status::label($s) }}</option>
-            @endforeach
-        </select>
-        <button class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Search</button>
-    </form>
-    <a href="{{ route('shipments.create') }}" class="rounded-lg bg-accent px-4 py-2 text-center text-sm font-semibold text-accent-foreground">New shipment</a>
-</div>
-
+<div class="workspace-intro shipment-list-header"><div><p class="eyebrow">YOUR SHIPPING WORKSPACE</p><h2>Every shipment. In sight.</h2><p>Find a booking, follow its journey, or start something new.</p></div><a class="button button-orange" href="{{ route('shipments.create') }}">＋ Create shipment</a></div>
+<form method="GET" class="filter-bar"><label class="sr-only" for="shipment-search">Search shipments</label><input id="shipment-search" name="q" value="{{ request('q') }}" placeholder="Search tracking number, city or recipient"><label class="sr-only" for="status-filter">Status</label><select id="status-filter" name="status"><option value="">All statuses</option>@foreach(\App\Services\ShipmentStatusService::STATUSES as $status)<option value="{{ $status }}" @selected(request('status')===$status)>{{ Status::label($status) }}</option>@endforeach</select><label class="filter-toggle"><input type="checkbox" name="attention" value="1" @checked(request()->boolean('attention'))>Needs attention</label><button class="button button-navy">Apply filters</button>@if(request()->hasAny(['q','status','attention']))<a href="{{ route('shipments.index') }}" class="quiet-link">Clear</a>@endif</form>
 {{-- Mobile cards --}}
 <div class="mt-4 space-y-3 md:hidden">
     @forelse ($shipments as $s)
@@ -29,7 +17,7 @@
             <div class="mt-2 flex justify-between text-xs text-muted-foreground"><span>{{ ucfirst($s->service_type) }}</span><span>${{ number_format((float) $s->shipping_cost, 2) }}</span></div>
         </a>
     @empty
-        <p class="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">No shipments found.</p>
+        <p class="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">No shipments match these filters. Create a booking or clear your filters to get started.</p>
     @endforelse
 </div>
 
@@ -49,7 +37,7 @@
                     <td class="px-4 py-3 text-right font-mono">${{ number_format((float) $s->shipping_cost, 2) }}</td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="px-4 py-8 text-center text-muted-foreground">No shipments found.</td></tr>
+                <tr><td colspan="5" class="px-4 py-8 text-center text-muted-foreground">No shipments match these filters. Create a booking or clear your filters to get started.</td></tr>
             @endforelse
         </tbody>
     </table>

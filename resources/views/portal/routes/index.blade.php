@@ -2,6 +2,7 @@
 @section('title', 'Routes — ShipFast')
 @section('heading', 'Routes')
 @section('content')
+<div class="workspace-intro"><div><p class="eyebrow">SHIPFAST / OPERATIONS</p><h2>Make the next connection.</h2><p>Maintain your route catalog and planned transit information.</p></div></div>
 <div class="flex justify-end"><a href="{{ route('routes.create') }}" class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground">New route</a></div>
 <div class="mt-4 overflow-hidden rounded-xl border border-border bg-card">
     <table class="w-full text-sm">

@@ -15,6 +15,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->intended($this->home(Auth::user()));
         }
+
         return view('auth.login');
     }
 
@@ -42,6 +43,9 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        if (is_string($request->input('email'))) {
+            $request->merge(['email' => strtolower(trim($request->input('email')))]);
+        }
         $data = $request->validate([
             'first_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['nullable', 'string', 'max:100'],

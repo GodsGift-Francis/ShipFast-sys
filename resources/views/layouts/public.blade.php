@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('body')
-@php($nav = [['Services','#'],['Track','#'],['Get a quote','#']])
-<header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
+@php($nav = [['Services',route('services')],['Track shipment',route('track.form')],['Get a quote',route('quote.form')]])
+<header x-data="{ open: false }" class="public-nav sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
     <div class="container mx-auto flex h-16 items-center justify-between px-4">
         @include('partials.brand')
 

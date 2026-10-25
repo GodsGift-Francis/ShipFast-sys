@@ -10,9 +10,9 @@
     ['notifications.index','Alerts','M15 17h5l-1.4-1.4A2 2 0 0118 14V11a6 6 0 10-12 0v3a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1'],
 ])
 @php($bottom = [$nav[0], $nav[1], $nav[3], $nav[6]])
-<div class="flex min-h-screen bg-secondary/30" x-data="{ open: false }">
+<div class="portal-shell flex min-h-screen bg-secondary/30" x-data="{ open: false }">
     {{-- Desktop sidebar --}}
-    <aside class="hidden w-64 flex-col border-r border-border bg-primary text-primary-foreground md:flex">
+    <aside class="portal-sidebar hidden w-64 flex-col border-r border-border bg-primary text-primary-foreground md:flex">
         <div class="flex h-16 items-center border-b border-primary-foreground/10 px-6">@include('partials.brand')</div>
         @include('partials.portal-nav', ['nav' => $nav])
         @include('partials.portal-user')
@@ -30,20 +30,20 @@
     </div>
 
     <div class="flex min-w-0 flex-1 flex-col">
-        <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/85 px-4 backdrop-blur md:px-6">
+        <header class="portal-topbar sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/85 px-4 backdrop-blur md:px-6">
             <div class="flex items-center gap-2">
                 <button @click="open=true" class="md:hidden" aria-label="Open menu">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
-                <h1 class="font-display text-lg font-extrabold tracking-tight">@yield('heading', 'Operations')</h1>
+                <h1 class="font-display text-lg font-extrabold tracking-tight"><span class="topbar-context">Workspace <span>/</span></span> @yield('heading', 'Operations')</h1>
             </div>
             <div class="flex items-center gap-3">
                 <span class="hidden items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-wider text-positive sm:flex">
-                    <span class="h-2 w-2 rounded-full bg-positive"></span> Operational
+                    <span class="h-2 w-2 rounded-full bg-positive"></span> Local workspace
                 </span>
                 <a href="{{ route('notifications.index') }}" class="relative p-2 text-muted-foreground hover:text-foreground">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14V11a6 6 0 10-12 0v3a2 2 0 01-.6 1.4L4 17h5"/></svg>
-                    <span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full border border-background bg-accent"></span>
+
                 </a>
             </div>
         </header>
@@ -52,6 +52,7 @@
             @if (session('status'))
                 <div class="mb-4 rounded-lg border border-positive/30 bg-positive/10 px-4 py-2.5 text-sm">{{ session('status') }}</div>
             @endif
+            @if ($errors->any())<div role="alert" class="validation-alert"><strong>Please check the following</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
             @yield('content')
         </main>
     </div>

@@ -12,13 +12,13 @@ class Quote extends Model
     protected $fillable = [
         'service_type', 'origin_city', 'origin_country',
         'destination_city', 'destination_country', 'weight', 'dimensions',
-        'contact_name', 'contact_email', 'estimated_cost', 'estimated_days', 'status',
+        'expires_at', 'shipment_id', 'contact_name', 'contact_email', 'estimated_cost', 'estimated_days', 'status',
     ];
 
     protected function casts(): array
     {
         return [
-            'weight' => 'decimal:2',
+            'expires_at' => 'datetime', 'weight' => 'decimal:2',
             'estimated_cost' => 'decimal:2',
             'estimated_days' => 'integer',
         ];

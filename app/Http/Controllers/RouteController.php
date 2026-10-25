@@ -48,7 +48,7 @@ class RouteController extends Controller
             'origin_country' => ['required', 'string', 'max:120'],
             'destination_city' => ['required', 'string', 'max:120'],
             'destination_country' => ['required', 'string', 'max:120'],
-            'service_type' => ['required', 'in:standard,express,overnight,freight,international'],
+            'service_type' => ['required', 'in:standard,express,freight,international'],
             'transit_days' => ['required', 'integer', 'min:1'],
             'base_price' => ['required', 'numeric', 'min:0'],
             'currency' => ['required', 'string', 'max:8'],

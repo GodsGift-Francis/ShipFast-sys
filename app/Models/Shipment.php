@@ -19,12 +19,14 @@ class Shipment extends Model
         'recipient_name', 'recipient_email', 'recipient_phone',
         'weight', 'dimensions', 'shipping_cost',
         'estimated_delivery', 'actual_delivery', 'notes',
+        'origin_postal_code', 'destination_postal_code', 'contents_description', 'declared_value', 'hs_code', 'country_of_manufacture', 'signature_required', 'delivered_to', 'rate_breakdown',
     ];
 
     protected function casts(): array
     {
         return [
             'weight' => 'decimal:2',
+            'signature_required' => 'boolean', 'rate_breakdown' => 'array', 'declared_value' => 'decimal:2',
             'shipping_cost' => 'decimal:2',
             'estimated_delivery' => 'datetime',
             'actual_delivery' => 'datetime',

@@ -2,6 +2,7 @@
 @section('title', 'Alerts — ShipFast')
 @section('heading', 'Alerts & delivery log')
 @section('content')
+<div class="workspace-intro"><div><p class="eyebrow">SHIPFAST / OPERATIONS</p><h2>Every update has a story.</h2><p>Review delivery notifications and their recorded outcomes.</p></div></div>
 @php($channelBadge = fn($s) => match($s){'sent'=>'bg-emerald-100 text-emerald-800','failed'=>'bg-red-100 text-red-800',default=>'bg-gray-100 text-gray-700'})
 <div class="grid gap-6 lg:grid-cols-2">
     <div class="rounded-xl border border-border bg-card p-6">

@@ -1,36 +1,8 @@
 @extends('layouts.portal')
-@section('title', 'Quotes — ShipFast')
-@section('heading', 'Quotes')
+@section('title','Quotes — ShipFast')
+@section('heading','Quotes')
 @section('content')
 @use('App\Support\Status')
-<div class="overflow-hidden rounded-xl border border-border bg-card">
-    <table class="w-full text-sm">
-        <thead class="border-b border-border bg-secondary/40 text-left font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-            <tr><th class="px-4 py-3">Route</th><th class="px-4 py-3">Service</th><th class="px-4 py-3">Contact</th><th class="px-4 py-3 text-right">Estimate</th><th class="px-4 py-3">Status</th><th class="px-4 py-3"></th></tr>
-        </thead>
-        <tbody class="divide-y divide-border">
-            @forelse ($quotes as $q)
-                <tr class="hover:bg-secondary/30">
-                    <td class="px-4 py-3">{{ $q->origin_city }} &rarr; {{ $q->destination_city }}</td>
-                    <td class="px-4 py-3">{{ ucfirst($q->service_type) }}</td>
-                    <td class="px-4 py-3 text-muted-foreground">{{ $q->contact_email ?: '—' }}</td>
-                    <td class="px-4 py-3 text-right font-mono">${{ number_format((float) $q->estimated_cost, 2) }}</td>
-                    <td class="px-4 py-3"><span class="rounded-full px-2 py-0.5 text-[11px] font-semibold {{ Status::badge($q->status) }}">{{ Status::label($q->status) }}</span></td>
-                    <td class="px-4 py-3 text-right">
-                        @if ($q->status !== 'accepted')
-                            <form method="POST" action="{{ route('quotes.accept', $q) }}">@csrf
-                                <button class="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground">Accept &amp; create</button>
-                            </form>
-                        @else
-                            <span class="text-xs text-muted-foreground">Converted</span>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="6" class="px-4 py-8 text-center text-muted-foreground">No quotes yet.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
-<div class="mt-4">{{ $quotes->links() }}</div>
+<div class="workspace-intro"><div><p class="eyebrow">FROM ESTIMATE TO BOOKING</p><h2>A little closer to shipped.</h2><p>Review saved quotes and convert approved estimates into bookings.</p></div><a class="button button-orange" href="{{ route('quote.form') }}">＋ Get a quote</a></div>
+<div class="panel table-scroll"><table class="data-table"><thead><tr><th>Journey</th><th>Service</th><th>Contact</th><th>Estimate</th><th>Valid until</th><th>Status</th><th></th></tr></thead><tbody>@forelse($quotes as $q)@php($expired=($q->expires_at??$q->created_at->copy()->addDays(config('shipping.quote_valid_days')))->isPast())@php($state=$q->status==='pending' && $expired?'expired':$q->status)<tr><td>{{ $q->origin_city }} → {{ $q->destination_city }}</td><td>{{ ucfirst($q->service_type) }}</td><td>{{ $q->contact_email?:'No contact provided' }}</td><td>USD {{ number_format($q->estimated_cost,2) }}</td><td>{{ ($q->expires_at??$q->created_at->copy()->addDays(config('shipping.quote_valid_days')))->format('M d, Y') }}</td><td><span class="status-pill {{ Status::badge($state) }}">{{ Status::label($state) }}</span></td><td>@if($state==='pending')<form method="POST" action="{{ route('quotes.accept',$q) }}">@csrf<button class="button button-outline">Accept & create →</button></form>@elseif($q->shipment_id)<a class="text-link" href="{{ route('shipments.show',$q->shipment_id) }}">View booking ↗︎</a>@elseif($state==='expired')<span class="quiet-link">Request a new quote</span>@else<span class="quiet-link">Converted</span>@endif</td></tr>@empty<tr><td colspan="7"><div class="calm-empty"><span>↗︎</span><h4>Your next booking begins with a quote.</h4><p>Saved estimates appear here for review and acceptance.</p><a class="button button-navy" href="{{ route('quote.form') }}">Get a shipping quote →</a></div></td></tr>@endforelse</tbody></table></div><p class="summary-notice">Accepted quotes create pending bookings. Complete addresses, parcel contents and any cross-border details before collection.</p><div class="mt-4">{{ $quotes->links() }}</div>
 @endsection

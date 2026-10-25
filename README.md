@@ -4,15 +4,34 @@ Global shipping & logistics platform — Laravel 12 + Blade + Alpine + Tailwind,
 This is the PHP rewrite of the original Node app, built to run on standard cPanel/
 Namecheap shared hosting (PHP + MySQL, no Node process required in production).
 
-## Sprint status
+## Current local version
 
-- **Sprint 0 (this drop) — Foundation:** project skeleton, MySQL config, full database
-  schema (migrations) + Eloquent models, role middleware, the design system
-  (maritime/industrial tokens, fonts, effects), base public layout + home hero, and
-  the super-admin seeder.
-- **Next:** S1 public pages (Services/Track/Quote), S2 portal shell + dashboard,
-  S3 shipments + rate engine, S4 customers/invoices/routes, S5 notifications,
-  S6 super-admin panel, S7 polish + deploy.
+The public website and operations portal have been redesigned around tracking, transparent estimates and shipment milestones. Implemented features include:
+
+- Public home, service catalog, tracking timeline and live service comparison.
+- Guided booking with addresses, parcel contents, cross-border goods details and signature requirements.
+- Configurable USD tariff, validated dimensions, chargeable weight and business-day estimates.
+- Guarded status transitions, atomic tracking updates, exception reasons and recipient delivery confirmation.
+- Seven-day quotes with transaction-protected, idempotent booking conversion.
+- Editable uncollected bookings, an internal printable waybill, and an attention queue.
+- Customer, invoice, route, notification and super-admin management screens.
+- PHPUnit feature coverage for pricing, booking, authorization and lifecycle rules.
+
+Rates are ShipFast estimates, not carrier rates. Tracking is operator-recorded, not GPS or carrier-fed. The internal waybill is not a carrier label. Customs fields do not submit a declaration. Carrier integrations, pickup booking, holiday calendars and queued notification retries remain future work.
+
+Local Windows preview uses PHP 8.3 and SQLite at http://127.0.0.1:8123. To rebuild when Windows blocks Vite helper processes:
+
+~~~powershell
+node node_modules/vite/bin/vite.js build --configLoader native --config vite.local.config.js
+~~~
+
+Run tests with PHP:
+
+~~~sh
+php vendor/phpunit/phpunit/phpunit
+~~~
+
+The tests use a separate in-memory SQLite database. Local operation lists are not prepopulated with demo shipments.
 
 ## Requirements
 
