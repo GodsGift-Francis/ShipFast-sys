@@ -1,0 +1,5 @@
+@extends('layouts.account')
+@section('title','My invoices — ShipFast')
+@section('content')
+<div class="workspace-intro"><div><p class="eyebrow">YOUR SHIPPING RECORDS</p><h1>Invoices, clearly organized.</h1><p>View and print invoices linked to your customer account.</p></div></div><section class="panel table-scroll"><table class="data-table"><thead><tr><th>Invoice</th><th>Amount</th><th>Due date</th><th></th></tr></thead><tbody>@forelse($invoices as $invoice)<tr><td>{{ $invoice->invoice_number }}</td><td>{{ $invoice->currency }} {{ number_format($invoice->amount,2) }}</td><td>{{ $invoice->due_date?->format('M d, Y')??'Not set' }}</td><td><a class="text-link" href="{{ route('account.invoice',$invoice) }}">View invoice →</a></td></tr>@empty<tr><td colspan="4"><div class="calm-empty"><h2>No invoices yet.</h2><p>Invoices issued to your linked customer record will appear here.</p></div></td></tr>@endforelse</tbody></table></section><div class="mt-4">{{ $invoices->links() }}</div>
+@endsection

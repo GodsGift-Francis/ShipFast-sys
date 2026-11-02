@@ -19,6 +19,11 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function showAdmin()
+    {
+        return view('auth.login', ['adminLogin' => true]);
+    }
+
     public function login(Request $request)
     {
         $data = $request->validate([
@@ -28,7 +33,7 @@ class AuthController extends Controller
 
         $user = User::where('email', strtolower(trim($data['email'])))->first();
 
-        if (! $user || ! $user->password || ! Hash::check($data['password'], $user->password)) {
+        if (! $user || ! $user->password || ! Hash::check($data['password'], $user->password) || $user->isAdmin() !== $request->routeIs('admin.login.attempt')) {
             throw ValidationException::withMessages(['email' => 'Invalid email or password.']);
         }
         if ($user->isSuspended()) {
@@ -38,7 +43,7 @@ class AuthController extends Controller
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
-        return redirect()->intended($this->home($user));
+        return $user->isAdmin() ? redirect()->intended($this->home($user)) : redirect()->route('account.dashboard');
     }
 
     public function register(Request $request)
@@ -50,7 +55,7 @@ class AuthController extends Controller
             'first_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['nullable', 'string', 'max:100'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:12', 'max:72'],
         ]);
 
         $user = User::create([
@@ -65,7 +70,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended($this->home($user));
+        return $user->isAdmin() ? redirect()->intended($this->home($user)) : redirect()->route('account.dashboard');
     }
 
     public function logout(Request $request)
@@ -79,6 +84,6 @@ class AuthController extends Controller
 
     private function home(User $user): string
     {
-        return $user->isAdmin() ? route('dashboard') : route('track.form');
+        return $user->isAdmin() ? route('dashboard') : route('account.dashboard');
     }
 }

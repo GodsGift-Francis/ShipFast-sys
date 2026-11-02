@@ -56,7 +56,7 @@
 
                     <form method="POST" action="{{ route('admin.users.password', $u) }}" x-show="pw" x-cloak class="flex items-end gap-2" style="display:none">
                         @csrf @method('PATCH')
-                        <input name="password" type="text" placeholder="New password (min 8)" class="rounded-lg border border-input bg-background px-3 py-2 text-sm" required>
+                        <input name="password" type="password" autocomplete="new-password" maxlength="72" placeholder="New password (12+; admin 16+)" class="rounded-lg border border-input bg-background px-3 py-2 text-sm" required>
                         <button class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground">Set</button>
                     </form>
                 </div>

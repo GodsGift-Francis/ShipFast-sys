@@ -12,6 +12,7 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate(['status' => ['nullable', 'string', 'max:60'], 'page' => ['nullable', 'integer', 'min:1']]);
         $invoices = Invoice::with('customer')
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->latest()->paginate(15)->withQueryString();
@@ -42,19 +43,21 @@ class InvoiceController extends Controller
         return view('portal.invoices.form', [
             'invoice' => $invoice,
             'customers' => Customer::orderBy('name')->get(),
-            'shipments' => Shipment::latest()->limit(100)->get(),
+            'shipments' => Shipment::whereIn('id', Shipment::latest()->limit(100)->pluck('id'))->orWhere('id', $invoice->shipment_id)->latest()->get(),
         ]);
     }
 
     public function update(Request $request, Invoice $invoice)
     {
         $invoice->update($this->validated($request));
+
         return redirect()->route('invoices.index')->with('status', 'Invoice updated.');
     }
 
     public function destroy(Invoice $invoice)
     {
         $invoice->delete();
+
         return back()->with('status', 'Invoice deleted.');
     }
 

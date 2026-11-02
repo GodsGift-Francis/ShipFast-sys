@@ -16,6 +16,7 @@ class QuoteController extends Controller
 
     public function index(Request $request)
     {
+        $request->validate(['status' => ['nullable', 'string', 'max:60'], 'page' => ['nullable', 'integer', 'min:1']]);
         $quotes = Quote::query()->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))->latest()->paginate(15)->withQueryString();
 
         return view('portal.quotes.index', compact('quotes'));
@@ -32,7 +33,7 @@ class QuoteController extends Controller
                 throw ValidationException::withMessages(['quote' => 'This quote has expired or is no longer available. Request a new estimate.']);
             }
             if (! array_key_exists($quote->service_type, config('shipping.services'))) {
-                throw ValidationException::withMessages(['quote'=>'This service is no longer available. Request a new quote.']);
+                throw ValidationException::withMessages(['quote' => 'This service is no longer available. Request a new quote.']);
             }
             // Quotes reserve a price; acceptance creates a draft booking awaiting dispatch details.
             $shipment = Shipment::create(['tracking_number' => ShipmentStatusService::trackingNumber(), 'status' => 'pending', 'service_type' => $quote->service_type, 'origin_city' => $quote->origin_city, 'origin_country' => $quote->origin_country, 'destination_city' => $quote->destination_city, 'destination_country' => $quote->destination_country, 'recipient_name' => $quote->contact_name, 'recipient_email' => $quote->contact_email, 'weight' => $quote->weight, 'dimensions' => $quote->dimensions, 'shipping_cost' => $quote->estimated_cost, 'estimated_delivery' => $engine->deliveryDate((int) ($quote->estimated_days ?? 3)), 'notes' => 'Created from quote #'.$quote->id.'. Confirm address, parcel and customs details before dispatch.']);

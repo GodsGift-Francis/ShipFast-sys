@@ -33,6 +33,15 @@ php vendor/phpunit/phpunit/phpunit
 
 The tests use a separate in-memory SQLite database. Local operation lists are not prepopulated with demo shipments.
 
+
+## Customer accounts and hosted release
+
+Customers sign in at /login and use /account. Operators sign in separately at /admin/login; no administrator entry is advertised on customer pages. New customer accounts require a super administrator to approve and explicitly link a customer record in /account-reviews. Portal shipment, invoice and notification access is scoped to that link.
+
+/settings provides profile-change requests, appearance preferences, current-password-confirmed password changes and other-session revocation. Identity changes remain pending until another super administrator reviews them. In-app decisions are private to the recipient. Passwords are masked with Show/Hide controls.
+
+For a new hosted installation, follow [the deployment guide](docs/DEPLOYMENT.md). Do not upload local configuration or seed a default administrator. Use the CLI-only shipfast:provision-admin command to create the first hosted account privately. Built release packaging is available through scripts/package-release.mjs.
+
 ## Requirements
 
 - PHP 8.2+ with extensions: pdo_mysql, mbstring, openssl, tokenizer, xml, ctype, json, bcmath, fileinfo, curl

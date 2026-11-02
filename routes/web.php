@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountReviewController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\PublicController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShipmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,4 +73,25 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->group(function
     Route::patch('/users/{user}', [AdminUserController::class, 'update'])->name('admin.users.update');
     Route::patch('/users/{user}/password', [AdminUserController::class, 'resetPassword'])->name('admin.users.password');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+});
+
+// Personal settings are shared; customer data is scoped in AccountController.
+Route::middleware(['auth', 'role:account'])->group(function () {
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::post('/settings/profile', [SettingsController::class, 'profile'])->middleware('throttle:10,1')->name('settings.profile');
+    Route::patch('/settings/preferences', [SettingsController::class, 'preferences'])->name('settings.preferences');
+    Route::patch('/settings/password', [SettingsController::class, 'password'])->middleware('throttle:5,1')->name('settings.password');
+    Route::delete('/settings/sessions', [SettingsController::class, 'sessions'])->name('settings.sessions');
+});
+Route::middleware(['auth', 'role:customer'])->prefix('account')->group(function () {
+    Route::get('/', [AccountController::class, 'index'])->name('account.dashboard');
+    Route::get('/shipments/{shipment}', [AccountController::class, 'shipment'])->name('account.shipment');
+    Route::get('/invoices', [AccountController::class, 'billing'])->name('account.invoices');
+    Route::get('/invoices/{invoice}', [AccountController::class, 'invoice'])->name('account.invoice');
+    Route::patch('/notifications/{notification}', [AccountController::class, 'read'])->name('account.notifications.read');
+});
+Route::middleware(['auth', 'role:super_admin'])->group(function () {
+    Route::get('/account-reviews', [AccountReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/account-reviews/users/{user}', [AccountReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/account-reviews/profiles/{profileRequest}', [AccountReviewController::class, 'profile'])->name('reviews.profile');
 });

@@ -16,6 +16,7 @@ class ShipmentController extends Controller
 
     public function index(Request $request)
     {
+        $request->validate(['q' => ['nullable', 'string', 'max:255'], 'status' => ['nullable', 'string', 'max:60'], 'attention' => ['nullable', 'boolean'], 'page' => ['nullable', 'integer', 'min:1']]);
         $shipments = Shipment::query()
             ->when($request->filled('q'), function ($query) use ($request) {
                 $q = trim($request->q);

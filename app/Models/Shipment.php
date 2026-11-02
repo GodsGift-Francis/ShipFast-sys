@@ -40,7 +40,7 @@ class Shipment extends Model
 
     public function events(): HasMany
     {
-        return $this->hasMany(TrackingEvent::class)->orderByDesc('timestamp');
+        return $this->hasMany(TrackingEvent::class)->orderByDesc('timestamp')->orderByDesc('id');
     }
 
     public function invoices(): HasMany

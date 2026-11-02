@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate(['q' => ['nullable', 'string', 'max:255'], 'page' => ['nullable', 'integer', 'min:1']]);
         $users = User::query()
             ->when($request->filled('q'), fn ($q) => $q->where('email', 'like', "%{$request->q}%")
                 ->orWhere('first_name', 'like', "%{$request->q}%")
@@ -31,7 +34,7 @@ class UserController extends Controller
         $this->guardSelf($user, 'modify');
 
         // A super_admin cannot be suspended.
-        if ($user->isSuperAdmin() && $data['status'] === 'suspended') {
+        if ($data['role'] === 'super_admin' && $data['status'] === 'suspended') {
             throw ValidationException::withMessages(['status' => 'Super admins cannot be suspended.']);
         }
 
@@ -47,8 +50,12 @@ class UserController extends Controller
 
     public function resetPassword(Request $request, User $user)
     {
-        $data = $request->validate(['password' => ['required', 'string', 'min:8']]);
-        $user->update(['password' => Hash::make($data['password'])]);
+        $this->guardSelf($user, 'reset');
+        $data = $request->validate(['password' => ['required', 'string', 'min:'.($user->isAdmin() ? 16 : 12), 'max:72']]);
+        $user->forceFill(['password' => Hash::make($data['password']), 'remember_token' => Str::random(60)])->save();
+        if (config('session.driver') === 'database') {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
 
         return back()->with('status', "Password reset for {$user->email}.");
     }

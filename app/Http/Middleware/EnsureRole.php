@@ -22,13 +22,18 @@ class EnsureRole
 
         if ($user->isSuspended()) {
             auth()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
             return redirect()->route('login')->withErrors(['email' => 'This account has been suspended.']);
         }
 
         $allowed = match ($role) {
             'super_admin' => $user->isSuperAdmin(),
             'admin' => $user->isAdmin(),
-            default => true,
+            'customer' => $user->role === 'customer',
+            'account' => true,
+            default => false,
         };
 
         abort_unless($allowed, 403);

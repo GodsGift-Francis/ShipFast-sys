@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Invoice;
 use App\Models\Quote;
 use App\Models\Shipment;
 use App\Models\User;
@@ -181,9 +182,9 @@ class ShippingWorkflowTest extends TestCase
 
     public function test_portal_and_waybill_are_role_protected(): void
     {
-        $this->get('/dashboard')->assertRedirect('/login');
+        $this->get('/dashboard')->assertRedirect('/admin/login');
         $shipment = $this->shipment();
-        $this->get('/shipments/'.$shipment->id.'/waybill')->assertRedirect('/login');
+        $this->get('/shipments/'.$shipment->id.'/waybill')->assertRedirect('/admin/login');
         $user = User::create(['email' => 'customer@example.test', 'password' => 'test-password', 'role' => 'customer', 'status' => 'active']);
         $this->actingAs($user)->get('/shipments')->assertForbidden();
     }
@@ -238,17 +239,63 @@ class ShippingWorkflowTest extends TestCase
     public function test_retired_service_cannot_be_booked_quoted_or_added_as_a_route(): void
     {
         $this->actingAs($this->admin());
-        $data=$this->payload(['service_type'=>'overnight']);
-        $this->postJson('/shipments',$data)->assertUnprocessable()->assertJsonValidationErrors('service_type');
-        $this->postJson('/quote',$data)->assertUnprocessable()->assertJsonValidationErrors('service_type');
-        $this->postJson('/routes',$data+['transit_days'=>1,'base_price'=>15,'currency'=>'USD'])->assertUnprocessable()->assertJsonValidationErrors('service_type');
+        $data = $this->payload(['service_type' => 'overnight']);
+        $this->postJson('/shipments', $data)->assertUnprocessable()->assertJsonValidationErrors('service_type');
+        $this->postJson('/quote', $data)->assertUnprocessable()->assertJsonValidationErrors('service_type');
+        $this->postJson('/routes', $data + ['transit_days' => 1, 'base_price' => 15, 'currency' => 'USD'])->assertUnprocessable()->assertJsonValidationErrors('service_type');
         $this->get('/services')->assertOk()->assertDontSee('Overnight');
         $this->get('/shipments/create')->assertOk()->assertDontSee('Overnight');
         $this->get('/routes/create')->assertOk()->assertDontSee('Overnight');
     }
+
     public function test_rate_engine_rejects_retired_service(): void
     {
         $this->expectException(ValidationException::class);
-        app(RateEngine::class)->quote('overnight',2,null,'Nigeria','Nigeria');
+        app(RateEngine::class)->quote('overnight', 2, null, 'Nigeria', 'Nigeria');
+    }
+
+    public function test_array_search_and_status_filters_are_rejected_without_server_errors(): void
+    {
+        $this->actingAs($this->admin());
+        foreach (['/shipments?q[]=bad', '/customers?q[]=bad', '/admin?q[]=bad', '/shipments?status[]=bad', '/quotes?status[]=bad', '/invoices?status[]=bad'] as $url) {
+            $this->getJson($url)->assertUnprocessable();
+        }
+    }
+
+    public function test_a_suspended_account_cannot_be_promoted_to_super_admin(): void
+    {
+        $this->actingAs($this->admin());
+        $user = User::create(['email' => 'other@example.test', 'password' => 'test-password', 'role' => 'customer', 'status' => 'suspended']);
+        $this->patchJson('/admin/users/'.$user->id, ['role' => 'super_admin', 'status' => 'suspended'])->assertUnprocessable()->assertJsonValidationErrors('status');
+        $this->assertSame('customer', $user->fresh()->role);
+    }
+
+    public function test_tracking_events_with_the_same_timestamp_show_newest_first(): void
+    {
+        $shipment = $this->shipment();
+        $older = $shipment->events()->create(['status' => 'processing', 'location' => 'Lagos', 'description' => 'Collected', 'timestamp' => now()]);
+        $newer = $shipment->events()->create(['status' => 'in_transit', 'location' => 'Lagos', 'description' => 'Departed', 'timestamp' => $older->timestamp]);
+        $this->assertSame([$newer->id, $older->id], $shipment->events()->pluck('id')->all());
+    }
+
+    public function test_held_shipment_retains_completed_tracking_milestones(): void
+    {
+        $shipment = $this->shipment(['status' => 'on_hold']);
+        $shipment->events()->create(['status' => 'in_transit', 'location' => 'Lagos', 'description' => 'Departed', 'timestamp' => now()->subMinute()]);
+        $shipment->events()->create(['status' => 'on_hold', 'location' => 'Lagos', 'description' => 'Weather', 'timestamp' => now()]);
+        $response = $this->get('/track/'.$shipment->tracking_number)->assertOk();
+        $this->assertSame(3, substr_count($response->getContent(), '<li class="done">'));
+    }
+
+    public function test_invoice_edit_keeps_its_linked_shipment_outside_the_recent_hundred(): void
+    {
+        $this->actingAs($this->admin());
+        $shipment = $this->shipment();
+        $shipment->forceFill(['created_at' => now()->subYear()])->save();
+        for ($i = 0; $i < 100; $i++) {
+            $this->shipment();
+        }
+        $invoice = Invoice::create(['invoice_number' => 'INV-REGRESSION', 'shipment_id' => $shipment->id, 'amount' => 10, 'currency' => 'USD', 'status' => 'draft']);
+        $this->get('/invoices/'.$invoice->id.'/edit')->assertOk()->assertViewHas('shipments', fn ($shipments) => $shipments->contains('id', $shipment->id));
     }
 }

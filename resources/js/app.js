@@ -96,7 +96,10 @@ Alpine.data("shippingForm", (initial = {}) => ({
           "That service is unavailable. Express is selected for this route.";
       }
     } catch (error) {
-      if (error.name !== "AbortError") this.error = error.message;
+      if (!signal.aborted) {
+        this.fingerprint = "";
+        this.error = error.message || "Could not calculate an estimate. Please try again.";
+      }
     } finally {
       if (!signal.aborted) this.loading = false;
     }

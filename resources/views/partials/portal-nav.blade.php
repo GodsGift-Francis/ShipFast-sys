@@ -7,7 +7,9 @@
             {{ $label }}
         </a>
     @endforeach
+    <a href="{{ route('settings') }}" class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-primary-foreground/70">⚙ Settings</a>
     @if (auth()->user()?->isSuperAdmin())
+    <a href="{{ route('reviews.index') }}" class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-primary-foreground/70">Account reviews</a>
         <p class="px-3 pb-2 pt-4 font-mono text-[10px] font-bold uppercase tracking-wider text-primary-foreground/40">Control</p>
         <a href="{{ route('admin.index') }}" class="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('admin.*') ? 'bg-accent/15 font-semibold text-accent' : 'text-primary-foreground/70 hover:bg-primary-foreground/10' }}">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.6-2.6A9 9 0 1112 3a9 9 0 018.6 5.4z"/></svg>

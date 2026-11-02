@@ -16,6 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'profile_image_url',
+        'customer_id', 'approved_at', 'preferences',
         'role',
         'status',
     ];
@@ -29,6 +30,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'customer_id' => 'integer', 'approved_at' => 'datetime', 'preferences' => 'array',
             'password' => 'hashed',
         ];
     }

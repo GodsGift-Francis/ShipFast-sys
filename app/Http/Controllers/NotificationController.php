@@ -9,7 +9,7 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = AppNotification::with('shipment')->latest()->limit(50)->get();
+        $notifications = AppNotification::whereNull('user_id')->with('shipment')->latest()->limit(50)->get();
         $deliveries = NotificationDelivery::with('shipment')->latest()->paginate(20);
 
         return view('portal.notifications.index', compact('notifications', 'deliveries'));

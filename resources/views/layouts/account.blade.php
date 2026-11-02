@@ -1,0 +1,4 @@
+@extends('layouts.app')
+@section('body')
+<div class="account-shell"><header class="account-header"><div class="site-wrap">@include('partials.brand')<nav aria-label="Account navigation"><a href="{{ route('account.dashboard') }}">My shipments</a><a href="{{ route('account.invoices') }}">Invoices</a><a href="{{ route('settings') }}">Settings</a><form method="POST" action="{{ route('logout') }}">@csrf<button>Sign out</button></form></nav></div></header><main class="site-wrap account-main">@if(session('status'))<div class="success-banner" role="status">{{ session('status') }}</div>@endif @if($errors->any())<div class="validation-alert" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif @yield('content')</main><footer class="site-wrap account-bottom">ShipFast · A clearer view of every delivery. <a href="{{ route('home') }}">Public website →</a></footer></div>
+@endsection

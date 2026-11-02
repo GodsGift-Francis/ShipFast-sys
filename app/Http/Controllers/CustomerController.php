@@ -9,6 +9,7 @@ class CustomerController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate(['q' => ['nullable', 'string', 'max:255'], 'page' => ['nullable', 'integer', 'min:1']]);
         $customers = Customer::query()
             ->when($request->filled('q'), fn ($q) => $q->where('name', 'like', "%{$request->q}%")->orWhere('email', 'like', "%{$request->q}%"))
             ->orderBy('name')->paginate(15)->withQueryString();
@@ -18,12 +19,13 @@ class CustomerController extends Controller
 
     public function create()
     {
-        return view('portal.customers.form', ['customer' => new Customer()]);
+        return view('portal.customers.form', ['customer' => new Customer]);
     }
 
     public function store(Request $request)
     {
         Customer::create($this->validated($request));
+
         return redirect()->route('customers.index')->with('status', 'Customer created.');
     }
 
@@ -35,12 +37,14 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
         $customer->update($this->validated($request));
+
         return redirect()->route('customers.index')->with('status', 'Customer updated.');
     }
 
     public function destroy(Customer $customer)
     {
         $customer->delete();
+
         return back()->with('status', 'Customer deleted.');
     }
 

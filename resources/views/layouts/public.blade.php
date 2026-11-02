@@ -14,7 +14,7 @@
 
         <div class="flex items-center gap-2">
             @auth
-                <a href="{{ auth()->user()->isAdmin() ? route('dashboard') : route('track.form') }}" class="hidden text-[13px] font-medium text-muted-foreground hover:text-foreground sm:block">{{ auth()->user()->isAdmin() ? 'Dashboard' : 'My shipments' }}</a>
+                <a href="{{ auth()->user()->isAdmin() ? route('dashboard') : route('account.dashboard') }}" class="hidden text-[13px] font-medium text-muted-foreground hover:text-foreground sm:block">{{ auth()->user()->isAdmin() ? 'Dashboard' : 'My shipments' }}</a>
                 <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">@csrf<button class="text-[13px] font-medium text-muted-foreground hover:text-foreground">Log out</button></form>
             @else
                 <a href="{{ route('login') }}" class="hidden text-[13px] font-medium text-muted-foreground hover:text-foreground sm:block">Log in</a>
