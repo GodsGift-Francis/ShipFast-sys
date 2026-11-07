@@ -76,7 +76,7 @@ class AccountWorkspaceTest extends TestCase
         $private = $this->shipment($this->customer($other), 'SHF-OTHER-PRIVATE');
         $this->actingAs($owner)->get('/account')->assertOk()->assertSee($ownShipment->tracking_number)->assertDontSee($private->tracking_number);
         $this->get('/account/shipments/'.$private->id)->assertNotFound();
-        $this->get('/account/shipments/'.$ownShipment->id)->assertOk();
+        $this->get('/account/shipments/'.$ownShipment->id)->assertOk()->assertSee('WHAT HAPPENS NEXT')->assertSee('Collection scan');
     }
 
     public function test_customer_cannot_read_other_invoices_or_notifications(): void

@@ -13,7 +13,7 @@
         document.documentElement.dataset.density=preferences.density??'comfortable';
         document.documentElement.dataset.reduceMotion=preferences.reduce_motion?'true':'false';
     </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/identity.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-full">
     @yield('body')

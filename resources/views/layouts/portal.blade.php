@@ -39,7 +39,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <span class="hidden items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-wider text-positive sm:flex">
-                    <span class="h-2 w-2 rounded-full bg-positive"></span> Local workspace
+                    <span class="h-2 w-2 rounded-full bg-positive"></span> @production Live workspace @else Local preview @endproduction
                 </span>
                 <a href="{{ route('notifications.index') }}" class="relative p-2 text-muted-foreground hover:text-foreground">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14V11a6 6 0 10-12 0v3a2 2 0 01-.6 1.4L4 17h5"/></svg>

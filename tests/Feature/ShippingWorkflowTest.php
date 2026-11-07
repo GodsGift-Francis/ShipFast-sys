@@ -195,6 +195,33 @@ class ShippingWorkflowTest extends TestCase
         $this->get('/track?number='.strtolower($shipment->tracking_number))->assertOk()->assertSee($shipment->tracking_number)->assertDontSee('private@example.test')->assertDontSee('Internal confidential note');
     }
 
+    public function test_tracking_explains_the_next_step_and_closed_statuses(): void
+    {
+        $shipment = $this->shipment(['status' => 'in_transit']);
+        $this->get('/track/'.$shipment->tracking_number)
+            ->assertOk()
+            ->assertSee('WHAT HAPPENS NEXT')
+            ->assertSee('Out for delivery')
+            ->assertSee('A local delivery update will appear');
+
+        $held = $this->shipment(['status' => 'on_hold']);
+        $this->get('/track/'.$held->tracking_number)
+            ->assertOk()
+            ->assertSee('Exception review')
+            ->assertSee('If anything is needed from you');
+
+        $delivered = $this->shipment(['status' => 'delivered']);
+        $this->get('/track/'.$delivered->tracking_number)
+            ->assertOk()
+            ->assertSee('Journey complete');
+
+        $cancelled = $this->shipment(['status' => 'cancelled']);
+        $this->get('/track/'.$cancelled->tracking_number)
+            ->assertOk()
+            ->assertSee('Booking closed')
+            ->assertSee('no further tracking updates are expected');
+    }
+
     public function test_dashboard_attention_queue_and_public_pages_render(): void
     {
         $this->actingAs($this->admin());
